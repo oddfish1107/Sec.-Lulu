@@ -27,8 +27,15 @@ class Long_message_popup:
         # label = customtkinter.CTkLabel(long_popup, text=message, wraplength=380, font=("Mengshen-Handwritten", 12))
         # label.pack(pady=20)
         self.long_popup = long_popup
+        self.app_callback = None # Placeholder for potential future callback functionality
     def show(self):
+        # display on top
+        self.long_popup.wm_attributes("-topmost", True)
+        # start the main loop to display the popup
         self.long_popup.mainloop()
+        # After the popup is closed, you could trigger a callback here if needed
+        if self.app_callback:
+            self.app_callback()
     def add_button(self, text, command):
         if command is None:
             command = self.long_popup.destroy

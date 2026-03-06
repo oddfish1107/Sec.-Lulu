@@ -99,8 +99,13 @@ class IntegratedApp:
                 # Create a fresh database connection for this thread
                 db = self.db_cls(self.db_path)
                 try:
-                    db.add_word(text, explanation[:100], explanation[:100])
-                    print(f"Saved: {text}")
+                    word_id = db.get_word_id(text) # variable used to check if word exists
+                    if word_id is not None:
+                        print(f"'{text}' already exists in the database.")
+                        db.update_review(word_id, 3)
+                    else:
+                        db.add_word(text, explanation[:100], explanation[:100])
+                        print(f"Saved: {text}")
                 finally:
                     db.close()
                 response_popup.long_popup.destroy()
@@ -108,8 +113,8 @@ class IntegratedApp:
             def close_popup():
                 response_popup.long_popup.destroy()
             
-            response_popup.add_button("Save word", save_word)
-            response_popup.add_button("Close", close_popup)
+            response_popup.add_button("Save/Update word", save_word)
+            # response_popup.add_button("Close", close_popup)
             response_popup.show()
         
         thread = threading.Thread(target=show_popup, daemon=True)

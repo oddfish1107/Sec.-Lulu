@@ -20,8 +20,6 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 
 - [x] **Anki-based** word review session
 - [x] Home: Challenge generator
-- [x]Simple(faster)/ Detailed explanation modes
-- [ ] Duplicated word entries handling
 - [ ] Personality-rich **AI profile**, flexibly blending both languages
 - [ ] Home: "What you learned" summaries
 - [ ] EasyOCR integration because Powertoys OCR messed it up sometimes
@@ -40,6 +38,7 @@ Please refer to the [GUIDE.md](./GUIDE.md) file
 ## Features (in progress)
 
 - Monitors clipboard for new words
+- Simple (faster)/ Detailed explanation modes
 - Organises word learning data into a personal profile
 - Daily "What you learned" summaries with tips, reviews and exercises
 
