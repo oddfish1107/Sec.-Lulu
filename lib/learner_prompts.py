@@ -1,3 +1,4 @@
+# When a volcano erupts, magma will喷出 from the volcano's口.
 def get_prompt(word,frequency):
     if frequency ==1:
         prompt = f"""Please explain this Chinese word "{word}" to a beginner learner encountering this word for the first time. Provide:
@@ -19,3 +20,5 @@ def get_prompt(word,frequency):
         Use simple language and clear formatting.
         """
     return prompt
+def get_short_prompt(word,frequency):
+    return f"""Please provide a concise explanation of the Chinese word "{word}" in English. Keep it brief and to the point, suitable for a quick review."""

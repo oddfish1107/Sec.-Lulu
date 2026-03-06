@@ -32,4 +32,6 @@ class OllamaClient:
         """
         # prompt_generator_func refers to logic like get_prompt(text, frequency)
         prompt = prompt_generator_func(text, frequency)
+        # print(prompt)
+        # exit()
         return self.generate_response(prompt)

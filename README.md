@@ -18,16 +18,13 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 
 **To-Do:**
 
-- [x] Learner's word database
-- [x] Repeated scanned word: explain mindfully + update revision (3-4)
-- [x] Side panel (always-on-top) for start/pausing operations
 - [x] **Anki-based** word review session
 - [x] Home: Challenge generator
-- [x] Mock database for test runs: ```python main.py --use-mock```
-- [ ] Home: "What you learned" summaries
-- [ ] Lite/Detailed mode: AI gives brief definition (faster) or explains word in detail
-- [ ] EasyOCR integration because Powertoys OCR messed it up sometimes
+- [x]Simple(faster)/ Detailed explanation modes
+- [ ] Duplicated word entries handling
 - [ ] Personality-rich **AI profile**, flexibly blending both languages
+- [ ] Home: "What you learned" summaries
+- [ ] EasyOCR integration because Powertoys OCR messed it up sometimes
 - [ ] PaddleOCR integration
 - [ ] Proper UI
 

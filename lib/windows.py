@@ -42,12 +42,20 @@ class ControlPanel:
         self.opened = False
         self.done = False
         self.app_callback = app_callback
+        self.response_mode="simple" # or "detailed" for more verbose status updates
         
         self.root = ctk.CTk()
         self.root.title("Monitor")
         self.root.resizable(width=False, height=False)
         self.root.wm_attributes("-topmost", True)
-        
+        # --- Mode changing buttons ---
+        self.mode_btn = ctk.CTkButton(
+            self.root, 
+            text="Switch to Detailed Mode", 
+            command=self.toggle_mode
+        )
+        self.mode_btn.pack(side="top", fill="x", padx=10, pady=5)
+
         # --- Responsive Start/Pause Button ---
         self.state_btn = ctk.CTkButton(
             self.root, 
@@ -84,7 +92,16 @@ class ControlPanel:
         else:
             self.state_btn.configure(text="Start", fg_color="green")
             print("Status: Paused")
-
+    def toggle_mode(self):
+        """Switches between Simple and Detailed response modes"""
+        if self.response_mode == "simple":
+            self.response_mode = "detailed"
+            self.mode_btn.configure(text="Switch to Simple Mode")
+            print("Response Mode: Detailed (verbose status updates enabled)")
+        else:
+            self.response_mode = "simple"
+            self.mode_btn.configure(text="Switch to Detailed Mode")
+            print("Response Mode: Simple (minimal status updates)")
     def open_app(self):
         """Triggers the main App launch without blocking the control panel"""
         if self.app_callback:

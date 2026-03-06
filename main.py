@@ -11,7 +11,7 @@ import time
 from lib.windows import ControlPanel, App, Long_message_popup
 from lib.reviewer import WordReviewer
 from lib.db import VocabDatabase
-from lib.learner_prompts import get_prompt
+from lib.learner_prompts import get_prompt, get_short_prompt
 from lib.localai import OllamaClient
 from mock_database_generator import MockDatabaseGenerator
 
@@ -79,7 +79,14 @@ class IntegratedApp:
                 frequency = 1
             
             # prompt = get_prompt(text, frequency)
-            return self.ai.get_word_explanation(text, frequency, get_prompt)
+            if self.control_panel and self.control_panel.response_mode == "detailed":
+                print(f"Generating detailed explanation for '{text}' (review count: {frequency})...")
+                # exit()
+                return self.ai.get_word_explanation(text, frequency, get_prompt)
+            else:
+                print(f"Generating concise explanation for '{text}'...")
+                # exit()
+                return self.ai.get_word_explanation(text, frequency, get_short_prompt)
         finally:
             db.close()
     
