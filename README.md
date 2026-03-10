@@ -21,11 +21,10 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 - [x] **Anki-based** word review session
 - [x] Personality-rich **AI profile**, flexibly blending both languages
 - [x] Optimizing Ollama for speed (keep_alive... )
-- [ ] Unload button -> Load/Unload
 - [ ] Home: "What you learned" summaries
 - [ ] EasyOCR integration because Powertoys OCR messed it up sometimes
-- [ ] PaddleOCR integration
 - [ ] Proper UI
+- [ ] More features
 
 ## Tech stack
 

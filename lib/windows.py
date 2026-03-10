@@ -3,6 +3,8 @@ import tkinter.messagebox as tkmb
 import customtkinter
 import os
 import threading
+
+from lib.localai import OllamaClient
 # from lib.localai import OllamaClient
 current_folder = os.path.dirname(os.path.abspath(__file__))
 # customtkinter.FontManager.load_font(os.path.join(current_folder, "Mengshen-HanSerif.ttf"))
@@ -45,9 +47,10 @@ class Long_message_popup:
 import customtkinter as ctk
 
 class ControlPanel:
-    def __init__(self, app_callback=None, ai_client=None): 
+    def __init__(self, app_callback=None, ai_client:OllamaClient=OllamaClient()): 
         self.ai = ai_client
         # app_callback is a function passed from your main script to launch App()
+        self.ai_opened = True  # Assume AI is loaded at start, can be changed based on actual state
         self.opened = False
         self.done = False
         self.app_callback = app_callback
@@ -66,14 +69,14 @@ class ControlPanel:
             text_color="gray"
         )
         self.status_label.pack(side="top", fill="x", padx=10, pady=5)
-        # --- Unload Model Button ---
-        self.unload_btn = ctk.CTkButton(
+        # --- AI Control Buttons ---
+        self.ai_btn = ctk.CTkButton(
             self.root, 
             text="Unload Model (Free VRAM)", 
             fg_color="#4a4a4a", 
-            command=self.unload_ai
+            command=self.toggle_ai
         )
-        self.unload_btn.pack(side="top", fill="x", padx=10, pady=5)
+        self.ai_btn.pack(side="top", fill="x", padx=10, pady=5)
         # --- Mode changing buttons ---
         self.mode_btn = ctk.CTkButton(
             self.root, 
@@ -114,6 +117,13 @@ class ControlPanel:
             text=f"AI Status: {status_text}", 
             text_color=color
         ))
+    def load_ai(self):
+        """Calls the AI client to load the model into VRAM"""
+        def task():
+            self.update_ai_status("Loading...", "orange")
+            if self.ai.manage_model("load"):
+                self.update_ai_status("Loaded (VRAM Occupied)", "green")
+        threading.Thread(target=task, daemon=True).start()
     def unload_ai(self):
         """Calls the AI client to clear VRAM"""
         def task():
@@ -121,6 +131,16 @@ class ControlPanel:
             if self.ai.manage_model("unload"):
                 self.update_ai_status("Unloaded (VRAM Free)", "gray")
         threading.Thread(target=task, daemon=True).start()
+    def toggle_ai(self):
+        """Toggles between loading and unloading the AI model"""
+        if self.ai_opened:
+            self.unload_ai()
+            self.ai_opened = False
+            self.ai_btn.configure(text="Load Model (Use VRAM)", fg_color="#4a4a4a")
+        else:
+            self.load_ai()
+            self.ai_opened = True
+            self.ai_btn.configure(text="Unload Model (Free VRAM)", fg_color="#4a4a4a")
     def toggle_state(self):
         """Switches between Start and Pause states"""
         self.opened = not self.opened
