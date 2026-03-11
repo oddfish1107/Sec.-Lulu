@@ -5,9 +5,10 @@
     <!-- <br> -->
 </h1>
 
-> <img align="right" alt="cover" src="./.misc/cover.jpg" width=25% height=25%>
+> <img align="right" alt="cover" src="./.misc/cover.png" width=25% height=25%>
 > Stop looking up words. Start living them.
-In the flow of reading or browsing, every unfamiliar word is an opportunity lost to the friction of switching tabs.Sec. Lulu - an AI language learning assistant - hopes to bridge that gap by **recording new words as you go** (clipboard or OCR), tailoring them into a **structured learning program** just for you.
+In the flow of reading or browsing, every unfamiliar word is an opportunity lost to the friction of switching tabs. Sec. Lulu - an AI language learning assistant - hopes to bridge that gap by **recording new words as you go** (clipboard or OCR), tailoring them into a **structured learning program** just for you.
+> <img align="right" alt="cover" src="./.misc/example.png" width=25% height=25%>
 <p>
 Instead of static dictionary entries, you receive AI-driven insights, usage examples, and creative stories that turn abstract characters into memorable concepts.</p>
 
@@ -17,6 +18,18 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 
 - Chinese
 
+## Features
+
+- Monitors clipboard for new words
+- Organises word learning data into a personal profile
+- *Daily "What you learned" summaries with tips, reviews and exercises (in progress*)
+
+### Modes
+
+- **Lookup-only**: fastest, searches individual words on local dictionary
+- **Simple**: fast, short,concise response from AI
+- **Detailed**: immersive response from AI
+
 **To-Do:**
 
 - [x] **Anki-based** word review session
@@ -24,9 +37,9 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 - [x] Optimizing Ollama for speed (keep_alive... )
 - [ ] Bunch of db.py and reviewer.py errors
 - [ ] Home: "What you learned" summaries
-- [ ] EasyOCR integration because Powertoys OCR messed it up sometimes
 - [ ] Proper UI
 - [ ] More features
+- [ ] EasyOCR integration because Powertoys OCR messed it up sometimes
 
 ## Tech stack
 
@@ -36,13 +49,6 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 ## Installation guide
 
 Please refer to the [GUIDE.md](./GUIDE.md) file
-
-## Features (in progress)
-
-- Monitors clipboard for new words
-- Simple (faster)/ Detailed explanation modes
-- Organises word learning data into a personal profile
-- Daily "What you learned" summaries with tips, reviews and exercises
 
 ## Bugs
 
