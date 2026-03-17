@@ -80,6 +80,7 @@ import customtkinter as ctk
 
 class ControlPanel:
     def __init__(self, app_callback=None, ai_client:OllamaClient=OllamaClient()): 
+        # ctk.set_default_color_theme("green")
         self.ai = ai_client
         # app_callback is a function passed from your main script to launch App()
         self.ai_opened = True  # Assume AI is loaded at start, can be changed based on actual state
@@ -306,25 +307,50 @@ class HomeFrame(ctk.CTkFrame):
         self.label = ctk.CTkLabel(self, text="Welcome Back", font=ctk.CTkFont(size=24, weight="bold"))
         self.label.pack(pady=(20, 0))
 
-        # AI Generated Insight Box
+        # AI Generated Insight Box (Challenge Section)
         self.insight_card = ctk.CTkFrame(self, fg_color=("gray90", "gray15"))
         self.insight_card.pack(fill="x", padx=40, pady=20)
         
         self.insight_title = ctk.CTkLabel(self.insight_card, text="✨ Daily AI Challenge", font=ctk.CTkFont(weight="bold"))
         self.insight_title.pack(pady=5)
         
-        self.insight_text = ctk.CTkLabel(self.insight_card, text="Click 'New Challenge' to generate a challenge", wraplength=400)
+        self.insight_text = ctk.CTkLabel(self.insight_card, text="Click 'New Challenge' to generate a challenge", 
+                                        wraplength=400, justify="left")
         self.insight_text.configure(font=("Mengshen-Handwritten", 14))
         self.insight_text.pack(pady=10, padx=10)
 
-        # Refresh Button for AI
-        self.refresh_btn = ctk.CTkButton(self, text="New Challenge", command=self.generate_challenge)
-        self.refresh_btn.pack(pady=10)
+        # Words Summary Section (based on challenge section)
+        self.summary_card = ctk.CTkFrame(self, fg_color=("gray85", "gray20"))
+        self.summary_card.pack(fill="x", padx=40, pady=20)
+        
+        self.summary_title = ctk.CTkLabel(self.summary_card, text="📚 Words Summary", font=ctk.CTkFont(weight="bold"))
+        self.summary_title.pack(pady=5)
+        
+        self.summary_text = ctk.CTkLabel(self.summary_card, text="Generate a challenge first to see word summaries", 
+                                        wraplength=400, justify="left")
+        self.summary_text.configure(font=("Mengshen-Handwritten", 12))
+        self.summary_text.pack(pady=10, padx=10)
+
+        # Buttons Frame
+        self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.button_frame.pack(pady=10)
+
+        # Refresh Button for Challenge
+        self.refresh_btn = ctk.CTkButton(self.button_frame, text="New Challenge", command=self.generate_challenge)
+        self.refresh_btn.pack(side="left", padx=5)
+
+        # Summary Button
+        self.summary_btn = ctk.CTkButton(self.button_frame, text="Generate Summary", 
+                                         command=self.generate_summary, state="disabled")
+        self.summary_btn.pack(side="left", padx=5)
+
+        # Store the last used words for summary generation
+        self.last_words = []
 
     def generate_challenge(self):
-        """Generate a vocabulary challenge using AI"""
+        """Generate a vocabulary challenge using AI (streaming)"""
         if self.is_generating:
-            tkmb.showwarning("In Progress", "Already generating a challenge. Please wait.")
+            tkmb.showwarning("In Progress", "Already generating. Please wait.")
             return
 
         if not self.ai or not self.db:
@@ -333,26 +359,39 @@ class HomeFrame(ctk.CTkFrame):
 
         # fetch words on main thread to avoid cross-thread DB usage
         try:
-            words = self.db.get_recent_words(limit=3)
+            self.last_words = self.db.get_recent_words(limit=3)
         except Exception as e:
-            words = []
+            self.last_words = []
             print(f"Error reading recent words: {e}")
 
         self.is_generating = True
         self.refresh_btn.configure(state="disabled")
+        self.summary_btn.configure(state="disabled")
+        
+        # Clear previous content and show generating message
         self.insight_text.configure(text="Generating challenge...")
+        self.summary_text.configure(text="Generate a challenge first to see word summaries")
 
         def generate():
             try:
-                if not words:
-                    response = "No words in database yet. Add some words first!"
+                if not self.last_words:
+                    final_text = "No words in database yet. Add some words first!"
+                    # For non-streaming response, update once
+                    self.after(0, lambda: self.insight_text.configure(text=final_text))
                 else:
-                    word_list = ", ".join([w[1] for w in words])
-                    prompt = f"Write a very short, funny 2-sentence story using these words: {word_list}"
-                    response = self.ai.generate_response(prompt)
+                    word_list = ", ".join([w[1] for w in self.last_words])
+                    prompt = f"Word Blossom Mode: {word_list}"
+                    
+                    # Stream the response
+                    full_response = ""
+                    for chunk in self.ai.generate_response(prompt):
+                        full_response += chunk
+                        # Update UI with current accumulated text
+                        self.after(0, lambda text=full_response: self.insight_text.configure(text=text))
+                    
+                    # Enable summary button after challenge is complete
+                    self.after(0, lambda: self.summary_btn.configure(state="normal"))
 
-                # Update UI in main thread
-                self.after(0, lambda: self.insight_text.configure(text=response))
             except Exception as e:
                 error_msg = f"Error generating challenge: {str(e)}"
                 self.after(0, lambda: self.insight_text.configure(text=error_msg))
@@ -362,6 +401,38 @@ class HomeFrame(ctk.CTkFrame):
 
         threading.Thread(target=generate, daemon=True).start()
 
+    def generate_summary(self):
+        """Generate a summary of the words used in the challenge"""
+        if self.is_generating or not self.last_words:
+            return
+
+        self.is_generating = True
+        self.refresh_btn.configure(state="disabled")
+        self.summary_btn.configure(state="disabled")
+        
+        self.summary_text.configure(text="Generating summary...")
+
+        def generate():
+            try:
+                word_list = ", ".join([w[1] for w in self.last_words])
+                prompt = f"Summarize these words with Sparkle Notes Mode: {word_list}"
+                
+                # Stream the summary
+                full_summary = ""
+                for chunk in self.ai.generate_response(prompt):
+                    full_summary += chunk
+                    # Update UI with current accumulated text
+                    self.after(0, lambda text=full_summary: self.summary_text.configure(text=text))
+
+            except Exception as e:
+                error_msg = f"Error generating summary: {str(e)}"
+                self.after(0, lambda: self.summary_text.configure(text=error_msg))
+            finally:
+                self.is_generating = False
+                self.after(0, lambda: self.refresh_btn.configure(state="normal"))
+                self.after(0, lambda: self.summary_btn.configure(state="normal"))
+
+        threading.Thread(target=generate, daemon=True).start()
 class App(ctk.CTk):
     def __init__(self, reviewer, ai_client=None, db=None):
         super().__init__()

@@ -5,11 +5,10 @@
     <!-- <br> -->
 </h1>
 
-> <img align="right" alt="cover" src="./.misc/cover.png" width=25% height=25%>
+> <img align="right" alt="cover" src="./.misc/cover.png" width=30% height=30%>
 > Stop looking up words. Start living them.
 In the flow of reading or browsing, every unfamiliar word is an opportunity lost to the friction of switching tabs. Sec. Lulu - an AI language learning assistant - hopes to bridge that gap by **recording new words as you go** (clipboard or OCR), tailoring them into a **structured learning program** just for you.
-> <img align="right" alt="cover" src="./.misc/example.png" width=25% height=25%>
-<p>
+
 Instead of static dictionary entries, you receive AI-driven insights, usage examples, and creative stories that turn abstract characters into memorable concepts.</p>
 
 The setup is local, no cloud, no data collection. Just you and your language learning journey.
@@ -24,6 +23,9 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 - Organises word learning data into a personal profile
 - *Daily "What you learned" summaries with tips, reviews and exercises (in progress*)
 
+> <img align="right" alt="cover" src="./.misc/example.png" width=35% height=35%>
+<p>
+
 ### Modes
 
 - **Lookup-only**: fastest, searches individual words on local dictionary
@@ -33,13 +35,17 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 **To-Do:**
 
 - [x] **Anki-based** word review session
-- [x] Personality-rich **AI profile**, flexibly blending both languages
+- [x] Personality-rich **AI profile**
 - [x] Optimizing Ollama for speed (keep_alive... )
-- [ ] Bunch of db.py and reviewer.py errors
-- [ ] Home: "What you learned" summaries
-- [ ] Proper UI
+- [ ] Home: Better "What you learned" summaries (scrollable box, update AI profile)
+- [ ] Themed UI
+- [ ] AI flexibly blending both languages
+- [ ] Enhancing UI
 - [ ] More features
 - [ ] EasyOCR integration because Powertoys OCR messed it up sometimes
+
+- [ ] Bunch of db.py and reviewer.py errors
+- [ ] Removing None from ControlPanel breaks everything
 
 ## Tech stack
 
