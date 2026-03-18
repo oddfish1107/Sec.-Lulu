@@ -26,15 +26,19 @@ class MockDatabaseGenerator(VocabDatabase):
             # words are created 2 days from now to ensure they are due for review
             created_at = int(time.time()) - 2 * 86400
             word_id = str(uuid.uuid4())
-            self.cursor.execute("""
-                INSERT INTO words VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                word_id, word, translation, example, created_at,
-                0,      # review_count
-                2.5,    # ease_factor
-                1,      # interval
-                created_at + 86400  # next_review (1 day from creation)
-            ))
+            # insert if word isn't already in the database
+            if not self.cursor.execute("SELECT 1 FROM words WHERE word = ?", (word,)).fetchone():
+                self.cursor.execute("""
+                    INSERT OR IGNORE INTO words VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    word_id, word, translation, example, created_at,
+                    0,      # review_count
+                    2.5,    # ease_factor
+                    1,      # interval
+                    created_at + 86400  # next_review (1 day from creation)
+                ))
+            else:
+                print(f"Word '{word}' already exists in the database. Skipping insertion.")
         self.conn.commit()
 
 if __name__ == "__main__":

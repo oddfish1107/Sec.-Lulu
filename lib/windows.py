@@ -19,7 +19,8 @@ except ImportError as e:
     from localai import OllamaClient
     print(f"Error importing OllamaClient: {e}")
 # customtkinter.FontManager.load_font(os.path.join(current_folder, "Mengshen-HanSerif.ttf"))
-customtkinter.FontManager.load_font(os.path.join(current_folder, "Mengshen-Handwritten.ttf"))
+
+
 def popup_message(title, message):
     root = tk.Tk()
     root.withdraw()  # Hide the main window
@@ -81,6 +82,10 @@ import customtkinter as ctk
 class ControlPanel:
     def __init__(self, app_callback=None, ai_client:OllamaClient=OllamaClient()): 
         # ctk.set_default_color_theme("green")
+        # theme from theme.json
+        customtkinter.set_appearance_mode("dark")
+        customtkinter.set_default_color_theme(os.path.join(current_folder, "theme.json"))
+
         self.ai = ai_client
         # app_callback is a function passed from your main script to launch App()
         self.ai_opened = True  # Assume AI is loaded at start, can be changed based on actual state
@@ -314,9 +319,12 @@ class HomeFrame(ctk.CTkFrame):
         self.insight_title = ctk.CTkLabel(self.insight_card, text="✨ Daily AI Challenge", font=ctk.CTkFont(weight="bold"))
         self.insight_title.pack(pady=5)
         
-        self.insight_text = ctk.CTkLabel(self.insight_card, text="Click 'New Challenge' to generate a challenge", 
-                                        wraplength=400, justify="left")
-        self.insight_text.configure(font=("Mengshen-Handwritten", 14))
+            # self.insight_text = ctk.CTkLabel(self.insight_card, text="Click 'New Challenge' to generate a challenge", 
+            #                                 wraplength=400, justify="left")
+            # self.insight_text.configure(font=("Mengshen-Handwritten", 14))
+        # scrollable text area, fixed height with scrollbar
+        self.insight_text = ctk.CTkTextbox(self.insight_card, wrap="word", font=("Mengshen-Handwritten", 14), height=150,width=450)
+        self.insight_text.configure(state="disabled")
         self.insight_text.pack(pady=10, padx=10)
 
         # Words Summary Section (based on challenge section)
@@ -326,9 +334,11 @@ class HomeFrame(ctk.CTkFrame):
         self.summary_title = ctk.CTkLabel(self.summary_card, text="📚 Words Summary", font=ctk.CTkFont(weight="bold"))
         self.summary_title.pack(pady=5)
         
-        self.summary_text = ctk.CTkLabel(self.summary_card, text="Generate a challenge first to see word summaries", 
-                                        wraplength=400, justify="left")
-        self.summary_text.configure(font=("Mengshen-Handwritten", 12))
+        # self.summary_text = ctk.CTkLabel(self.summary_card, text="Generate a challenge first to see word summaries", 
+        #                                 wraplength=400, justify="left")
+        # self.summary_text.configure(font=("Mengshen-Handwritten", 12))
+        self.summary_text = ctk.CTkTextbox(self.summary_card, wrap="word", font=("Mengshen-Handwritten", 12), height=150,width=450)
+        self.summary_text.configure(state="disabled")
         self.summary_text.pack(pady=10, padx=10)
 
         # Buttons Frame
@@ -346,7 +356,12 @@ class HomeFrame(ctk.CTkFrame):
 
         # Store the last used words for summary generation
         self.last_words = []
-
+    def append_text(self, text,box):
+        """Thread-safe way to add text to the box."""
+        box.configure(state="normal")
+        box.insert("end", text)
+        box.configure(state="disabled")
+        box.see("end") # Auto-scroll to bottom
     def generate_challenge(self):
         """Generate a vocabulary challenge using AI (streaming)"""
         if self.is_generating:
@@ -369,8 +384,13 @@ class HomeFrame(ctk.CTkFrame):
         self.summary_btn.configure(state="disabled")
         
         # Clear previous content and show generating message
-        self.insight_text.configure(text="Generating challenge...")
-        self.summary_text.configure(text="Generate a challenge first to see word summaries")
+        self.insight_text.configure(state="normal")
+        self.insight_text.delete("1.0", "end")
+        self.insight_text.insert("1.0", "Generating challenge...")
+        self.insight_text.configure(state="disabled")
+        self.summary_text.configure(state="normal")
+        self.summary_text.delete("1.0", "end")
+        self.summary_text.configure(state="disabled")
 
         def generate():
             try:
@@ -387,7 +407,7 @@ class HomeFrame(ctk.CTkFrame):
                     for chunk in self.ai.generate_response(prompt):
                         full_response += chunk
                         # Update UI with current accumulated text
-                        self.after(0, lambda text=full_response: self.insight_text.configure(text=text))
+                        self.after(0, lambda text=full_response: self.append_text(text, self.insight_text))
                     
                     # Enable summary button after challenge is complete
                     self.after(0, lambda: self.summary_btn.configure(state="normal"))
@@ -422,11 +442,11 @@ class HomeFrame(ctk.CTkFrame):
                 for chunk in self.ai.generate_response(prompt):
                     full_summary += chunk
                     # Update UI with current accumulated text
-                    self.after(0, lambda text=full_summary: self.summary_text.configure(text=text))
+                    self.after(0, lambda text=full_summary: self.append_text(text, self.summary_text))
 
             except Exception as e:
                 error_msg = f"Error generating summary: {str(e)}"
-                self.after(0, lambda: self.summary_text.configure(text=error_msg))
+                self.after(0, lambda: self.append_text(error_msg, self.summary_text))
             finally:
                 self.is_generating = False
                 self.after(0, lambda: self.refresh_btn.configure(state="normal"))

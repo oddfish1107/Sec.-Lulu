@@ -5,7 +5,9 @@
     <!-- <br> -->
 </h1>
 
-> <img align="right" alt="cover" src="./.misc/cover.png" width=30% height=30%>
+> <img align="right" alt="cover" src="./.misc/cover.png" width=35% height=35%>
+
+> <img align="right" alt="cards" src="./.misc/cards.png" width=35% height=35%>
 > Stop looking up words. Start living them.
 In the flow of reading or browsing, every unfamiliar word is an opportunity lost to the friction of switching tabs. Sec. Lulu - an AI language learning assistant - hopes to bridge that gap by **recording new words as you go** (clipboard or OCR), tailoring them into a **structured learning program** just for you.
 
