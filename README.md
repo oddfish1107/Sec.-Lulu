@@ -37,15 +37,15 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 **To-Do:**
 
 - [x] **Anki-based** word review session
-- [x] Personality-rich **AI profile**
 - [x] Optimizing Ollama for speed (keep_alive... )
-- [ ] Home: Better "What you learned" summaries (scrollable box, update AI profile)
-- [ ] Themed UI
+- [x] Home: Better "What you learned" summaries (scrollable box, update AI profile)
+- [x] Tuning Modelfile for more precise responses + personality
+- [x] Enhancing UI: flexboxes, less buggy response streaming
 - [ ] AI flexibly blending both languages
-- [ ] Enhancing UI
 - [ ] More features
 - [ ] EasyOCR integration because Powertoys OCR messed it up sometimes
 
+- [ ] Card UI
 - [ ] Bunch of db.py and reviewer.py errors
 - [ ] Removing None from ControlPanel breaks everything
 

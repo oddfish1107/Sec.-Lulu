@@ -20,65 +20,6 @@ except ImportError as e:
     print(f"Error importing OllamaClient: {e}")
 # customtkinter.FontManager.load_font(os.path.join(current_folder, "Mengshen-HanSerif.ttf"))
 
-
-def popup_message(title, message):
-    root = tk.Tk()
-    root.withdraw()  # Hide the main window
-    tkmb.showinfo(title, message)
-    root.destroy()
-class Long_message_popup:
-    def __init__(self, title, message, master: ControlPanel,display_image=True):
-        # Use Toplevel and link it to the master (ControlPanel)
-        self.long_popup = customtkinter.CTkToplevel(master.root)
-        self.long_popup.geometry("600x300")
-        self.long_popup.title(title)
-        
-        # Ensure it stays on top
-        self.long_popup.attributes("-topmost", True)
-        
-        title_label = customtkinter.CTkLabel(self.long_popup, text=title, font=("Mengshen-Handwritten", 24, "bold"))
-        title_label.pack(pady=(5, 5))
-        if display_image:
-            # Add a random image (1.png-5.png) 
-            img_num = random.randint(1, 5)
-            try:
-                img_path = os.path.join(repo_folder,".misc","long_response", f"{img_num}.png")
-                img = Image.open(img_path)
-                # img = img.resize((100, 100), Image.ANTIALIAS)
-                # get image size and scale to fit within 150x150 while maintaining aspect ratio
-                img_size = img.size
-                max_size = (150, 150)
-                # Calculate the scale factor to fit the image within the maximum size
-                scale_factor = min(max_size[0] / img_size[0], max_size[1] / img_size[1])
-                new_size = (int(img_size[0] * scale_factor), int(img_size[1] * scale_factor))
-                # img = img.resize(new_size, Image.ANTIALIAS)
-                photo = customtkinter.CTkImage(img, size=new_size)
-                img_label = customtkinter.CTkLabel(self.long_popup, image=photo,text="")
-                img_label.image = photo  # Keep a reference to avoid garbage collection # pyright: ignore
-                # pack on left side
-                img_label.pack(side="left", padx=10, pady=0)
-            except Exception as e:
-                print(f"Error loading image: {e}")
-
-        self.text_box = customtkinter.CTkTextbox(self.long_popup, wrap="word", font=("Mengshen-Handwritten", 20))
-        self.text_box.insert("1.0", message)
-        self.text_box.configure(state="disabled")
-        self.text_box.pack(padx=20, pady=10, fill="both", expand=True)
-    def append_text(self, new_text):
-        """Thread-safe way to add text to the box."""
-        self.text_box.configure(state="normal")
-        self.text_box.insert("end", new_text)
-        self.text_box.configure(state="disabled")
-        self.text_box.see("end") # Auto-scroll to bottom
-    def show(self):
-        # No mainloop here! Toplevel uses the master's loop.
-        self.long_popup.focus_set()
-
-    def add_button(self, text, command):
-        btn = customtkinter.CTkButton(self.long_popup, text=text, command=command)
-        btn.pack(pady=10)
-import customtkinter as ctk
-
 class ControlPanel:
     def __init__(self, app_callback=None, ai_client:OllamaClient=OllamaClient()): 
         # ctk.set_default_color_theme("green")
@@ -218,6 +159,65 @@ class ControlPanel:
     def cancel(self):
         self.done = True
         self.root.destroy()
+def popup_message(title, message):
+    root = tk.Tk()
+    root.withdraw()  # Hide the main window
+    tkmb.showinfo(title, message)
+    root.destroy()
+class Long_message_popup:
+    def __init__(self, title, message, master: ControlPanel,display_image=True):
+        # Use Toplevel and link it to the master (ControlPanel)
+        self.long_popup = customtkinter.CTkToplevel(master.root)
+        self.long_popup.geometry("600x300")
+        self.long_popup.title(title)
+        
+        # Ensure it stays on top
+        self.long_popup.attributes("-topmost", True)
+        
+        title_label = customtkinter.CTkLabel(self.long_popup, text=title, font=("Mengshen-Handwritten", 24, "bold"))
+        title_label.pack(pady=(5, 5))
+        if display_image:
+            # Add a random image (1.png-5.png) 
+            img_num = random.randint(1, 5)
+            try:
+                img_path = os.path.join(repo_folder,".misc","long_response", f"{img_num}.png")
+                img = Image.open(img_path)
+                # img = img.resize((100, 100), Image.ANTIALIAS)
+                # get image size and scale to fit within 150x150 while maintaining aspect ratio
+                img_size = img.size
+                max_size = (150, 150)
+                # Calculate the scale factor to fit the image within the maximum size
+                scale_factor = min(max_size[0] / img_size[0], max_size[1] / img_size[1])
+                new_size = (int(img_size[0] * scale_factor), int(img_size[1] * scale_factor))
+                # img = img.resize(new_size, Image.ANTIALIAS)
+                photo = customtkinter.CTkImage(img, size=new_size)
+                img_label = customtkinter.CTkLabel(self.long_popup, image=photo,text="")
+                img_label.image = photo  # Keep a reference to avoid garbage collection # pyright: ignore
+                # pack on left side
+                img_label.pack(side="left", padx=10, pady=0)
+            except Exception as e:
+                print(f"Error loading image: {e}")
+
+        self.text_box = customtkinter.CTkTextbox(self.long_popup, wrap="word", font=("Mengshen-Handwritten", 20))
+        self.text_box.insert("1.0", message)
+        self.text_box.configure(state="disabled")
+        self.text_box.pack(padx=20, pady=10, fill="both", expand=True)
+    def append_text(self, new_text):
+        """Thread-safe way to add text to the box."""
+        self.text_box.configure(state="normal")
+        self.text_box.insert("end", new_text)
+        self.text_box.configure(state="disabled")
+        self.text_box.see("end") # Auto-scroll to bottom
+    def show(self):
+        # No mainloop here! Toplevel uses the master's loop.
+        self.long_popup.focus_set()
+
+    def add_button(self, text, command):
+        btn = customtkinter.CTkButton(self.long_popup, text=text, command=command)
+        btn.pack(pady=10)
+import customtkinter as ctk
+
+
 class ReviewFrame(ctk.CTkFrame):
     """Refactored from your original ReviewUI class"""
     def __init__(self, master, reviewer, **kwargs):
@@ -308,53 +308,53 @@ class HomeFrame(ctk.CTkFrame):
         self.db = db
         self.is_generating = False
         
+        # Configure grid weights for flexibility
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1) # Daily Challenge row
+        self.grid_rowconfigure(2, weight=1) # Words Summary row
+
         # Title
         self.label = ctk.CTkLabel(self, text="Welcome Back", font=ctk.CTkFont(size=24, weight="bold"))
-        self.label.pack(pady=(20, 0))
+        self.label.grid(row=0, column=0, pady=(20, 10), sticky="n")
 
-        # AI Generated Insight Box (Challenge Section)
+        # --- Daily AI Challenge Section ---
         self.insight_card = ctk.CTkFrame(self, fg_color=("gray90", "gray15"))
-        self.insight_card.pack(fill="x", padx=40, pady=20)
-        
-        self.insight_title = ctk.CTkLabel(self.insight_card, text="✨ Daily AI Challenge", font=ctk.CTkFont(weight="bold"))
-        self.insight_title.pack(pady=5)
-        
-            # self.insight_text = ctk.CTkLabel(self.insight_card, text="Click 'New Challenge' to generate a challenge", 
-            #                                 wraplength=400, justify="left")
-            # self.insight_text.configure(font=("Mengshen-Handwritten", 14))
-        # scrollable text area, fixed height with scrollbar
-        self.insight_text = ctk.CTkTextbox(self.insight_card, wrap="word", font=("Mengshen-Handwritten", 14), height=150,width=450)
-        self.insight_text.configure(state="disabled")
-        self.insight_text.pack(pady=10, padx=10)
+        self.insight_card.grid(row=1, column=0, padx=40, pady=10, sticky="nsew")
+        self.insight_card.grid_columnconfigure(0, weight=1)
+        self.insight_card.grid_rowconfigure(1, weight=1)
 
-        # Words Summary Section (based on challenge section)
+        self.insight_title = ctk.CTkLabel(self.insight_card, text="✨ Daily AI Challenge", font=ctk.CTkFont(weight="bold"))
+        self.insight_title.grid(row=0, column=0, pady=5)
+        
+        # Textbox set to sticky "nsew" to fill the card
+        self.insight_text = ctk.CTkTextbox(self.insight_card, wrap="word", font=("Mengshen-Handwritten", 14), height=100)
+        self.insight_text.configure(state="disabled")
+        self.insight_text.grid(row=1, column=0, pady=10, padx=10, sticky="nsew")
+
+        # --- Words Summary Section ---
         self.summary_card = ctk.CTkFrame(self, fg_color=("gray85", "gray20"))
-        self.summary_card.pack(fill="x", padx=40, pady=20)
+        self.summary_card.grid(row=2, column=0, padx=40, pady=10, sticky="nsew")
+        self.summary_card.grid_columnconfigure(0, weight=1)
+        self.summary_card.grid_rowconfigure(1, weight=1)
         
         self.summary_title = ctk.CTkLabel(self.summary_card, text="📚 Words Summary", font=ctk.CTkFont(weight="bold"))
-        self.summary_title.pack(pady=5)
+        self.summary_title.grid(row=0, column=0, pady=5)
         
-        # self.summary_text = ctk.CTkLabel(self.summary_card, text="Generate a challenge first to see word summaries", 
-        #                                 wraplength=400, justify="left")
-        # self.summary_text.configure(font=("Mengshen-Handwritten", 12))
-        self.summary_text = ctk.CTkTextbox(self.summary_card, wrap="word", font=("Mengshen-Handwritten", 12), height=150,width=450)
+        self.summary_text = ctk.CTkTextbox(self.summary_card, wrap="word", font=("Mengshen-Handwritten", 12), height=100)
         self.summary_text.configure(state="disabled")
-        self.summary_text.pack(pady=10, padx=10)
+        self.summary_text.grid(row=1, column=0, pady=10, padx=10, sticky="nsew")
 
-        # Buttons Frame
+        # --- Buttons Frame ---
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.button_frame.pack(pady=10)
+        self.button_frame.grid(row=3, column=0, pady=20)
 
-        # Refresh Button for Challenge
         self.refresh_btn = ctk.CTkButton(self.button_frame, text="New Challenge", command=self.generate_challenge)
         self.refresh_btn.pack(side="left", padx=5)
 
-        # Summary Button
         self.summary_btn = ctk.CTkButton(self.button_frame, text="Generate Summary", 
                                          command=self.generate_summary, state="disabled")
         self.summary_btn.pack(side="left", padx=5)
 
-        # Store the last used words for summary generation
         self.last_words = []
     def append_text(self, text,box):
         """Thread-safe way to add text to the box."""
