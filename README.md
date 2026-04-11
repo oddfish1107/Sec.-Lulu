@@ -37,11 +37,11 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 **To-Do:**
 
 - [x] **Anki-based** word review session
-- [x] Optimizing Ollama for speed (keep_alive... )
 - [x] Home: Better "What you learned" summaries (scrollable box, update AI profile)
-- [x] Tuning Modelfile for more precise responses + personality
-- [x] Enhancing UI: flexboxes, less buggy response streaming
-- [ ] AI flexibly blending both languages
+- [x] Sentence mode
+- [ ] Renewed UI
+- [ ] AI flexibly blending both languages (When a volcano erupts, magma will喷出 from the volcano's口)
+- [ ] More test cases for each mode for debugging
 - [ ] More features
 - [ ] EasyOCR integration because Powertoys OCR messed it up sometimes
 
