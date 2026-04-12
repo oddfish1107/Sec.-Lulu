@@ -38,13 +38,14 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 
 - [x] **Anki-based** word review session
 - [x] Home: Better "What you learned" summaries (scrollable box, update AI profile)
-- [x] Sentence mode
+- [ ] Full Sentence mode(word pick UI - show translation and quick def, some switch to mixed language sentence) (integrated revision, better explanation on long-complex sentences)
 - [ ] Renewed UI
 - [ ] AI flexibly blending both languages (When a volcano erupts, magma will喷出 from the volcano's口)
 - [ ] More test cases for each mode for debugging
 - [ ] More features
 - [ ] EasyOCR integration because Powertoys OCR messed it up sometimes
 
+- [ ] Initial clipboard data isn't sent
 - [ ] Card UI
 - [ ] Bunch of db.py and reviewer.py errors
 - [ ] Removing None from ControlPanel breaks everything

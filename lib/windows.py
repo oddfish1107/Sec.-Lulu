@@ -6,6 +6,7 @@ import threading
 from PIL import Image, ImageTk
 import random
 
+MODES=["Lookup Only","Sparkle Notes","Immersion Mode", "Word Blossom", "Sentence Whisper"]
 
 # from lib.localai import OllamaClient
 current_folder = os.path.dirname(os.path.abspath(__file__))
@@ -33,9 +34,8 @@ class ControlPanel:
         self.opened = False
         self.done = False
         self.app_callback = app_callback
-        self.response_mode="simple" 
-        # or "detailed" for more verbose status updates
-        # or "lookup_only" for minimal output (e.g., just the word explanation without status messages)
+        self.mode_index = 1
+        self.response_mode = MODES[self.mode_index]
         
         self.root = ctk.CTk()
         self.root.title("Monitor")
@@ -59,7 +59,7 @@ class ControlPanel:
         # --- Mode changing buttons ---
         self.mode_btn = ctk.CTkButton(
             self.root, 
-            text="Simple mode enabled",
+            text=f"Mode: {self.response_mode}",
             command=self.toggle_mode
         )
         self.mode_btn.pack(side="top", fill="x", padx=10, pady=5)
@@ -130,19 +130,11 @@ class ControlPanel:
             self.state_btn.configure(text="Start", fg_color="green")
             self.update_ai_status("Paused", "gray")
     def toggle_mode(self):
-        """Switches between Simple and Detailed response modes"""
-        if self.response_mode == "simple":
-            self.response_mode = "detailed"
-            self.mode_btn.configure(text="Detailed mode enabled")
-            print("Response Mode: Detailed (verbose status updates enabled)")
-        elif self.response_mode == "detailed":
-            self.response_mode = "lookup_only"
-            self.mode_btn.configure(text="Lookup-Only mode enabled")
-            print("Response Mode: Lookup-Only (minimal output)")
-        else:
-            self.response_mode = "simple"
-            self.mode_btn.configure(text="Simple mode enabled")
-            print("Response Mode: Simple (default status updates)")
+        """Rotate through the available response modes."""
+        self.mode_index = (self.mode_index + 1) % len(MODES)
+        self.response_mode = MODES[self.mode_index]
+        self.mode_btn.configure(text=f"Mode: {self.response_mode}")
+        print(f"Response Mode: {self.response_mode}")
     def open_app(self):
         """Triggers the main App launch without blocking the control panel"""
         if self.app_callback:

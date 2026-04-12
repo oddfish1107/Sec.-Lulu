@@ -12,7 +12,7 @@ from PIL import Image
 from lib.windows import ControlPanel, App, Long_message_popup
 from lib.reviewer import WordReviewer
 from lib.db import VocabDatabase
-from lib.learner_prompts import get_prompt, get_short_prompt
+from lib.learner_prompts import get_prompt, prompt_generator_for_mode
 from lib.localai import OllamaClient
 from mock_database_generator import MockDatabaseGenerator
 
@@ -109,16 +109,12 @@ class IntegratedApp:
             else:
                 frequency = 1
             
-            # prompt = get_prompt(text, frequency)
-            if self.control_panel and self.control_panel.response_mode == "detailed":
-                print(f"Generating detailed explanation for '{text}' (review count: {frequency})...")
-                # exit()
-                return self.ai.get_word_explanation(text, frequency, get_prompt)
-            elif self.control_panel and self.control_panel.response_mode == "simple":
-                print(f"Generating concise explanation for '{text}'...")
-                # exit()
-                return self.ai.get_word_explanation(text, frequency, get_short_prompt)
+            if self.control_panel:
+                mode = self.control_panel.response_mode
             else:
+                mode = "Sparkle Notes"
+
+            if mode == "Lookup Only":
                 print(f"Generating explanation for '{text}' in lookup-only mode...")
                 word_match, char_matches = lookup_cedict(text, entries)
                 if word_match:
@@ -128,6 +124,11 @@ class IntegratedApp:
                     for char, entry in char_matches:
                         char_info.append(f"{char}: {entry['simplified']} ({entry['traditional']}), Definitions: {'; '.join(entry['definitions'])}")
                     return f"No direct match for '{text}'. Character breakdown:\n" + "\n".join(char_info)
+                return f"No direct match found for '{text}'."
+
+            print(f"Generating {mode} explanation for '{text}'...")
+            prompt_fn = prompt_generator_for_mode(mode)
+            return self.ai.get_word_explanation(text, frequency, prompt_fn)
         finally:
             db.close()
     
@@ -137,7 +138,12 @@ class IntegratedApp:
         # Create the popup immediately (ensure Long_message_popup is modified to allow updates)
         # We pass empty string initially
         # print(self.control_panel.response_mode)
-        response_popup = Long_message_popup("Explanation", "", master=self.control_panel, display_image=(self.control_panel.response_mode != "lookup_only"))
+        response_popup = Long_message_popup(
+            "Explanation",
+            "",
+            master=self.control_panel,
+            display_image=(self.control_panel.response_mode.lower() != "lookup only"),
+        )
         
         def stream_thread():
             full_explanation = ""
