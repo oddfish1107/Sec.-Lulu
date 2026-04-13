@@ -380,9 +380,6 @@ class HomeFrame(ctk.CTkFrame):
         self.insight_text.delete("1.0", "end")
         self.insight_text.insert("1.0", "Generating challenge...")
         self.insight_text.configure(state="disabled")
-        self.summary_text.configure(state="normal")
-        self.summary_text.delete("1.0", "end")
-        self.summary_text.configure(state="disabled")
 
         def generate():
             try:
@@ -402,14 +399,16 @@ class HomeFrame(ctk.CTkFrame):
                         self.after(0, lambda text=full_response: self.append_text(text, self.insight_text))
                     
                     # Enable summary button after challenge is complete
-                    self.after(0, lambda: self.summary_btn.configure(state="normal"))
+                    self.summary_btn.configure(state="normal")
 
             except Exception as e:
                 error_msg = f"Error generating challenge: {str(e)}"
                 self.after(0, lambda: self.insight_text.configure(text=error_msg))
             finally:
                 self.is_generating = False
-                self.after(0, lambda: self.refresh_btn.configure(state="normal"))
+                self.refresh_btn.configure(state="normal")
+                # Move this line to the end of generate_challenge()
+                self.summary_btn.configure(state="disabled")
 
         threading.Thread(target=generate, daemon=True).start()
 
@@ -420,8 +419,8 @@ class HomeFrame(ctk.CTkFrame):
 
         self.is_generating = True
         self.refresh_btn.configure(state="disabled")
-        self.summary_btn.configure(state="disabled")
         
+        # Clear previous content and show generating message
         self.summary_text.configure(text="Generating summary...")
 
         def generate():
@@ -438,11 +437,11 @@ class HomeFrame(ctk.CTkFrame):
 
             except Exception as e:
                 error_msg = f"Error generating summary: {str(e)}"
-                self.after(0, lambda: self.append_text(error_msg, self.summary_text))
+                self.after(0, lambda: self.summary_text.configure(text=error_msg))
             finally:
                 self.is_generating = False
-                self.after(0, lambda: self.refresh_btn.configure(state="normal"))
-                self.after(0, lambda: self.summary_btn.configure(state="normal"))
+                # Move this line to the end of generate_summary()
+                self.refresh_btn.configure(state="normal")
 
         threading.Thread(target=generate, daemon=True).start()
 class App(ctk.CTk):
@@ -491,4 +490,3 @@ if __name__ == "__main__":
     longpop=Long_message_popup("Test Long Popup", "This is a test of the long message popup. It should display this text and an image if enabled.", master=panel, display_image=True)
     longpop.show()
     panel.show()
-    # longpop.show()
