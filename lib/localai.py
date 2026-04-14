@@ -36,15 +36,22 @@ class OllamaClient:
         
         try:
             # Use stream=True in the requests call
-            response = requests.post(self.url, json=payload, stream=True)
-            
-            for line in response.iter_lines():
-                if line:
-                    chunk = json.loads(line.decode('utf-8'))
-                    token = chunk.get('response', '')
-                    yield token  # Yield each piece of text
-                    if chunk.get('done', False):
-                        break
+            response = requests.post(self.url, json=payload, stream=True, timeout=120)
+            response.raise_for_status()
+
+            for line in response.iter_lines(decode_unicode=True):
+                if not line:
+                    continue
+                try:
+                    chunk = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+
+                token = chunk.get("response", "")
+                if token:
+                    yield token
+                if chunk.get("done", False):
+                    break
         except Exception as e:
             yield f"\n[Error: {e}]"
 
