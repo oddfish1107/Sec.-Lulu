@@ -64,3 +64,11 @@ python main.py --db-path path/to/custom.db
 1. Click **Start** to enable clipboard monitoring
 2. Copy Chinese text to clipboard for instant explanations
 3. Click **Open Main App** to review vocabulary
+
+## Testing
+
+### Modelfile changes
+
+```bash
+ollama rm xiaoxi ;; python build_modelfile.py --all --output Modelfile ;; ollama create xiaoxi -f Modelfile ;; ollama run xiaoxi
+```
