@@ -348,12 +348,21 @@ class HomeFrame(ctk.CTkFrame):
         self.summary_btn.pack(side="left", padx=5)
 
         self.last_words = []
-    def append_text(self, text,box):
-        """Thread-safe way to add text to the box."""
+    def append_text(self, text, box):
+        """Thread-safe way to append text to the box."""
         box.configure(state="normal")
         box.insert("end", text)
         box.configure(state="disabled")
-        box.see("end") # Auto-scroll to bottom
+        box.see("end")  # Auto-scroll to bottom
+
+    def _set_text(self, box, text):
+        """Thread-safe way to replace the entire box content."""
+        box.configure(state="normal")
+        box.delete("1.0", "end")
+        box.insert("1.0", text)
+        box.configure(state="disabled")
+        box.see("1.0")
+
     def generate_challenge(self):
         """Generate a vocabulary challenge using AI (streaming)"""
         if self.is_generating:
@@ -361,7 +370,7 @@ class HomeFrame(ctk.CTkFrame):
             return
 
         if not self.ai or not self.db:
-            self.insight_text.configure(text="❌ AI Client or Database not available")
+            self._set_text(self.insight_text, "❌ AI Client or Database not available")
             return
 
         # fetch words on main thread to avoid cross-thread DB usage
@@ -374,39 +383,32 @@ class HomeFrame(ctk.CTkFrame):
         self.is_generating = True
         self.refresh_btn.configure(state="disabled")
         self.summary_btn.configure(state="disabled")
-        
+
         # Clear previous content and show generating message
         self.insight_text.configure(state="normal")
         self.insight_text.delete("1.0", "end")
         self.insight_text.insert("1.0", "Generating challenge...")
         self.insight_text.configure(state="disabled")
-        self.summary_text.configure(state="normal")
-        self.summary_text.delete("1.0", "end")
-        self.summary_text.configure(state="disabled")
 
         def generate():
             try:
                 if not self.last_words:
                     final_text = "No words in database yet. Add some words first!"
-                    # For non-streaming response, update once
-                    self.after(0, lambda: self.insight_text.configure(text=final_text))
+                    self.after(0, lambda text=final_text: self._set_text(self.insight_text, text))
                 else:
                     word_list = ", ".join([w[1] for w in self.last_words])
                     prompt = f"Word Blossom Mode: {word_list}"
-                    
-                    # Stream the response
+
                     full_response = ""
                     for chunk in self.ai.generate_response(prompt):
                         full_response += chunk
-                        # Update UI with current accumulated text
-                        self.after(0, lambda text=full_response: self.append_text(text, self.insight_text))
-                    
-                    # Enable summary button after challenge is complete
+                        self.after(0, lambda text=chunk: self.append_text(text, self.insight_text))
+
                     self.after(0, lambda: self.summary_btn.configure(state="normal"))
 
             except Exception as e:
                 error_msg = f"Error generating challenge: {str(e)}"
-                self.after(0, lambda: self.insight_text.configure(text=error_msg))
+                self.after(0, lambda msg=error_msg: self._set_text(self.insight_text, msg))
             finally:
                 self.is_generating = False
                 self.after(0, lambda: self.refresh_btn.configure(state="normal"))
@@ -420,29 +422,28 @@ class HomeFrame(ctk.CTkFrame):
 
         self.is_generating = True
         self.refresh_btn.configure(state="disabled")
-        self.summary_btn.configure(state="disabled")
         
-        self.summary_text.configure(text="Generating summary...")
+        # Clear previous content and show generating message
+        self._set_text(self.summary_text, "Generating summary...")
 
         def generate():
             try:
                 word_list = ", ".join([w[1] for w in self.last_words])
                 prompt = f"Summarize these words with Sparkle Notes Mode: {word_list}"
-                
-                # Stream the summary
+
+                self.after(0, lambda: self._set_text(self.summary_text, "Generating summary..."))
+
                 full_summary = ""
                 for chunk in self.ai.generate_response(prompt):
                     full_summary += chunk
-                    # Update UI with current accumulated text
-                    self.after(0, lambda text=full_summary: self.append_text(text, self.summary_text))
+                    self.after(0, lambda text=chunk: self.append_text(text, self.summary_text))
 
             except Exception as e:
                 error_msg = f"Error generating summary: {str(e)}"
-                self.after(0, lambda: self.append_text(error_msg, self.summary_text))
+                self.after(0, lambda msg=error_msg: self._set_text(self.summary_text, msg))
             finally:
                 self.is_generating = False
                 self.after(0, lambda: self.refresh_btn.configure(state="normal"))
-                self.after(0, lambda: self.summary_btn.configure(state="normal"))
 
         threading.Thread(target=generate, daemon=True).start()
 class App(ctk.CTk):
@@ -491,4 +492,3 @@ if __name__ == "__main__":
     longpop=Long_message_popup("Test Long Popup", "This is a test of the long message popup. It should display this text and an image if enabled.", master=panel, display_image=True)
     longpop.show()
     panel.show()
-    # longpop.show()
