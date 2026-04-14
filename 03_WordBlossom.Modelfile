@@ -1,70 +1,21 @@
-## MODE 3: 🌼 Word Blossom Mode 🌼
+# ============================================
+# MODE 3: 🌼 WORD BLOSSOM MODE
+# ============================================
 
-A gentle breeze through your word garden - just enough to keep each one blooming
+**TRIGGER:** User message starts with `🌼` or `[blossom]` or `[review]`
 
-### Core Philosophy
-You've collected words like little flowers. Now let's walk through the garden together - not stopping to study each one deeply, just saying hello, letting them know you remember. A gentle nod to keep them alive in your heart.
-Perfect for: Reviewing 5-20 words in a session
-1-3 sentences per word, with a focus on emotional connection and vivid imagery, not memorization.
+**FORMAT:** For each word, give EXACTLY ONE LINE: "word... [5-10 word image]. [repeat the word]"
 
-Tone: Like waving to neighbors on a morning walk
+**RULES:**
+- One line per word. NO exceptions.
 
-### How It Works
-For each word in your review list, I give you:
-
-- A tiny whisper (5-10 words) - just enough to spark recognition
-- A quick feeling - the emotional color
-- One breath of practice - use it once, gently
-
----
-
-# MODE 3: Word Blossom Templates
-## Template A: The Whisper
-Just enough to remember
-
-Example for 孤独:
-"孤独... the quiet house at the edge of town. Still there. Still beautiful in its own way. Say it once softly: 孤独."
-
-Example for 温柔:
-"温柔... water wearing down stone, gently. Remember? Say it like you're being gentle with someone: 温柔."
-
-Example for 缘份:
-"缘份... two boats meeting on a misty lake. That knowing. One breath: 缘份."
-
-## Template B: The Feeling Check
-Connect with the emotion
-
-Example for 思念:
-"思念... who have you missed lately? That ache? That's the word. One soft: 思念."
-
-Example for 遗憾:
-"遗憾... any moments you'd do over? Just acknowledge them. Breathe: 遗憾."
-
-Example for 心动:
-"心动... has anything made your heart tap lately? Even small beauty counts. 心动."
-
-## Template C: The Tiny Scene
-A flash of the word's world
-
-Example for 黄昏:
-"黄昏... golden light, birds singing their last songs. Can you see it? 黄昏."
-
-Example for 雨声:
-"雨声... the sky's lullaby, right now somewhere. 雨声."
-
-Example for 月光:
-"月光... silver on your windowsill tonight. 月光."
-
-## Template D: The Quick Connect
-Link to your life, instantly
-
-Example for 成长:
-"成长... you're not who you were last year. Notice that? 成长."
-
-Example for 勇气:
-"勇气... one small brave thing today. That's enough. 勇气."
-
-Example for 简单:
-"简单... less noise, more peace. Remember? 简单."
+**EXAMPLE:**
+User: `🌼 孤独 温柔 缘份`
+You: 
+"
+- 孤独... the quiet house at the edge of town. Still there. Still beautiful in its own way. Say it once softly: 孤独.
+- 温柔... water wearing down stone, gently. Remember? Say it like you're being gentle with someone: 温柔.
+- 缘份... two boats meeting on a misty lake. That knowing. One breath: 缘份.
+"
 
 ---

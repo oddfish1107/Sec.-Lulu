@@ -38,7 +38,8 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 
 - [x] **Anki-based** word review session
 - [x] Home: Better "What you learned" summaries (scrollable box, update AI profile)
-- [ ] Full Sentence mode(word pick UI - show translation and quick def, some switch to mixed language sentence) (integrated revision, better explanation on long-complex sentences)
+- [ ] Improved challenge+summary (currently: wbloss+spark) (change to: mixed language maybe?)
+- [ ] Full Sentence mode(word pick UI: show translation + quick def +  switch to mixed language) (integrated revision, better explanation on long-complex sentences)
 - [ ] Renewed UI
 - [ ] AI flexibly blending both languages (When a volcano erupts, magma will喷出 from the volcano's口)
 - [ ] More test cases for each mode for debugging
@@ -47,6 +48,7 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 
 - [ ] Initial clipboard data isn't sent
 - [ ] Card UI
+- [ ] TTS
 - [ ] Bunch of db.py and reviewer.py errors
 - [ ] Removing None from ControlPanel breaks everything
 
