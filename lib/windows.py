@@ -20,11 +20,12 @@ except ImportError as e:
     from localai import OllamaClient
     print(f"Error importing OllamaClient: {e}")
 try:
-    from lib.ccedict import lookup_cedict, extract_chinese_word_at_position
+    from lib.ccedict import lookup_cedict, extract_chinese_word_at_position, is_chinese_char
 except ImportError:
     # Fallback if ccedict module is not available
     lookup_cedict = None
     extract_chinese_word_at_position = None
+    is_chinese_char = None
 # customtkinter.FontManager.load_font(os.path.join(current_folder, "Mengshen-HanSerif.ttf"))
 
 class ControlPanel:
@@ -261,6 +262,13 @@ class Long_message_popup:
             # Ensure we're within bounds
             if abs_pos >= len(text_content):
                 return
+            
+            # Normalize position: Tkinter @x,y can land on the boundary AFTER a character.
+            # If the character at abs_pos is not Chinese but the one before it is,
+            # use abs_pos - 1 to start from the actual hovered character.
+            if abs_pos > 0 and not is_chinese_char(text_content[abs_pos]):
+                if is_chinese_char(text_content[abs_pos - 1]):
+                    abs_pos = abs_pos - 1
             
             # Extract the Chinese word at this position
             word, start_pos, end_pos = extract_chinese_word_at_position(text_content, abs_pos, self.word_index)

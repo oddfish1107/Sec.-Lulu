@@ -40,12 +40,13 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 - [x] Home: Better "What you learned" summaries (scrollable box, update AI profile)
 - [x] Improved challenge+summary  ~~(change to: mixed language maybe?)~~
 - [x] Integrated lookup mode(word hover: show translation + quick def) 
+- [ ] EasyOCR integration because Powertoys OCR messed it up sometimes
+- [ ] What does "Save word" a sentence do??
 - [ ] (integrated revision, better explanation on long-complex sentences)
 - [ ] Renewed UI
 - [ ] ~~AI flexibly blending both languages (When a volcano erupts, magma will喷出 from the volcano's口)~~
 - [ ] More test cases for each mode for debugging
 - [ ] More features
-- [ ] EasyOCR integration because Powertoys OCR messed it up sometimes
 
 - [ ] Initial clipboard data isn't sent
 - [ ] Card UI
