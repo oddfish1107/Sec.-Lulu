@@ -14,38 +14,11 @@ from lib.reviewer import WordReviewer
 from lib.db import VocabDatabase
 from lib.learner_prompts import get_prompt, prompt_generator_for_mode
 from lib.localai import OllamaClient
+from lib.ccedict import load_cedict_entries, lookup_cedict
 from mock_database_generator import MockDatabaseGenerator
 
-def parse_cedict_line(line):
-    if line.startswith("#"):
-        return None
-    
-    trad, simp, rest = line.split(" ", 2)
-    pinyin = rest.split("]")[0][1:]
-    defs = rest.split("/")[1:-1]
-    
-    return {
-        "traditional": trad,
-        "simplified": simp,
-        "pinyin": pinyin,
-        "definitions": defs
-    }
-def lookup_cedict(word, entries):
-    '''Returns the definition for a given word. If the word is not found, returns definitions of individual characters.'''
-    for entry in entries:
-        if entry["simplified"] == word or entry["traditional"] == word:
-            return entry, []
-    # If not found, try character-level lookup
-    char_matches = []
-    for char in word:
-        for entry in entries:
-            if entry["simplified"] == char or entry["traditional"] == char:
-                char_matches.append((char, entry))
-                break
-    return None, char_matches
-    
-with open("cedict_ts.u8", encoding="utf-8") as f:
-    entries = [parse_cedict_line(l) for l in f if parse_cedict_line(l)]
+# Load CEDICT entries and build indices at startup
+_, word_index, char_index = load_cedict_entries("cedict_ts.u8")
 
 class IntegratedApp:
     """Main application that coordinates ControlPanel and VocabApp"""
@@ -66,6 +39,9 @@ class IntegratedApp:
         self.last_clipboard_text = ""
         self.control_panel = None
         self.ai = OllamaClient()
+        # Store CEDICT indices for use in get_explanation
+        self.word_index = word_index
+        self.char_index = char_index
     
     def launch_vocab_app(self):
         """Launch the vocabulary learning app in a separate thread"""
@@ -116,7 +92,7 @@ class IntegratedApp:
 
             if mode == "Lookup Only":
                 print(f"Generating explanation for '{text}' in lookup-only mode...")
-                word_match, char_matches = lookup_cedict(text, entries)
+                word_match, char_matches = lookup_cedict(text, self.word_index, self.char_index)
                 if word_match:
                     return f"{word_match['simplified']} ({word_match['traditional']}), Definitions: {'; '.join(word_match['definitions'])}"
                 elif char_matches:
@@ -143,6 +119,8 @@ class IntegratedApp:
             "",
             master=self.control_panel,
             display_image=(self.control_panel.response_mode.lower() != "lookup only"),
+            word_index=self.word_index,
+            char_index=self.char_index,
         )
         
         def stream_thread():
