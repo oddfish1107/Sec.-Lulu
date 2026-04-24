@@ -23,8 +23,9 @@ def parse_cedict_line(line):
 def load_cedict_entries(cedict_path="cedict_ts.u8"):
     """Load and index all CEDICT entries for fast lookup."""
     entries = []
-    word_index = {}  # simplified/traditional -> entry
-    char_index = {}  # single character -> list of entries
+    word_index = {}  # simplified/traditional -> entry (for any word length)
+    char_index = {}  # single character -> list of all entries containing it (for longest-match extraction)
+    char_def_index = {}  # single character -> entry (ONLY single-char definitions, for character fallback)
     
     try:
         with open(cedict_path, encoding="utf-8") as f:
@@ -32,38 +33,49 @@ def load_cedict_entries(cedict_path="cedict_ts.u8"):
                 entry = parse_cedict_line(line)
                 if entry:
                     entries.append(entry)
+                    simp = entry["simplified"]
+                    
                     # Index by word (simplified and traditional forms)
-                    word_index[entry["simplified"]] = entry
+                    word_index[simp] = entry
                     word_index[entry["traditional"]] = entry
-                    # Index by character for fallback lookup
-                    for char in entry["simplified"]:
+                    
+                    # Index by character for fallback lookup (all entries containing this char)
+                    for char in simp:
                         if char not in char_index:
                             char_index[char] = []
                         if entry not in char_index[char]:
                             char_index[char].append(entry)
+                    
+                    # Index single-character definitions only (for character-level display)
+                    if len(simp) == 1:
+                        char_def_index[simp] = entry
     except FileNotFoundError:
         print(f"Warning: CEDICT file not found at {cedict_path}")
     
-    return entries, word_index, char_index
+    return entries, word_index, char_index, char_def_index
 
 
-def lookup_cedict(word, word_index, char_index):
+def lookup_cedict(word, word_index, char_def_index):
     """
     Lookup a word in CEDICT indices.
     Returns (word_entry, char_matches) tuple:
     - word_entry: Direct match entry for the word, or None
-    - char_matches: List of (char, entry) tuples for individual character fallback
+    - char_matches: List of (char, entry) tuples for individual CHARACTER definitions only (not phrases)
+    
+    Args:
+        word: Word to lookup
+        word_index: Index of all words
+        char_def_index: Index of ONLY single-character definitions
     """
     # Try direct word lookup
     if word in word_index:
         return word_index[word], []
     
-    # Fallback: character-level lookup
+    # Fallback: character-level lookup using ONLY single-character definitions
     char_matches = []
     for char in word:
-        if char in char_index:
-            # Get the first entry for this character (usually most common)
-            entry = char_index[char][0]
+        if char in char_def_index:
+            entry = char_def_index[char]
             char_matches.append((char, entry))
     
     return None, char_matches

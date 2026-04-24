@@ -164,7 +164,7 @@ def popup_message(title, message):
     tkmb.showinfo(title, message)
     root.destroy()
 class Long_message_popup:
-    def __init__(self, title, message, master: ControlPanel, display_image=True, word_index=None, char_index=None):
+    def __init__(self, title, message, master: ControlPanel, display_image=True, word_index=None, char_def_index=None):
         # Use Toplevel and link it to the master (ControlPanel)
         self.long_popup = customtkinter.CTkToplevel(master.root)
         self.long_popup.geometry("800x350")
@@ -172,7 +172,7 @@ class Long_message_popup:
         
         # Store CEDICT indices for hover lookup
         self.word_index = word_index or {}
-        self.char_index = char_index or {}
+        self.char_def_index = char_def_index or {}
         self.last_looked_up_word = None
         
         # Ensure it stays on top
@@ -290,7 +290,7 @@ class Long_message_popup:
         self.lookup_text.delete("1.0", "end")
         
         # Perform CEDICT lookup
-        word_entry, char_matches = lookup_cedict(word, self.word_index, self.char_index)
+        word_entry, char_matches = lookup_cedict(word, self.word_index, self.char_def_index)
         
         if word_entry:
             # Direct word match found
