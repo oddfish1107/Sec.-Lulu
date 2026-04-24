@@ -15,7 +15,7 @@ print(f"Text: {text}")
 print()
 
 # Load CEDICT to test longest-match
-_, word_index, char_index = load_cedict_entries("cedict_ts.u8")
+_, word_index, char_index, char_def_index = load_cedict_entries("cedict_ts.u8")
 print("Testing extract_chinese_word_at_position (longest-match from position):")
 print()
 
@@ -30,13 +30,15 @@ for pos in test_positions:
             print(f"  Position {pos} ('{text[pos]}'): no valid word found")
 
 print()
-print("Testing lookup_cedict:")
+print("Testing lookup_cedict with char_def_index (ONLY single-char definitions):")
 test_words = ["你好", "世界", "一个", "测试", "xyz"]
 for w in test_words:
-    entry, chars = lookup_cedict(w, word_index, char_index)
+    entry, chars = lookup_cedict(w, word_index, char_def_index)
     if entry:
         print(f"  {w}: Found (pinyin: {entry['pinyin']})")
     elif chars:
         print(f"  {w}: Character matches {len(chars)}")
+        for char, char_entry in chars:
+            print(f"       {char}: {char_entry['pinyin']}")
     else:
         print(f"  {w}: No match")

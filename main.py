@@ -18,7 +18,7 @@ from lib.ccedict import load_cedict_entries, lookup_cedict
 from mock_database_generator import MockDatabaseGenerator
 
 # Load CEDICT entries and build indices at startup
-_, word_index, char_index = load_cedict_entries("cedict_ts.u8")
+_, word_index, char_index, char_def_index = load_cedict_entries("cedict_ts.u8")
 
 class IntegratedApp:
     """Main application that coordinates ControlPanel and VocabApp"""
@@ -42,6 +42,7 @@ class IntegratedApp:
         # Store CEDICT indices for use in get_explanation
         self.word_index = word_index
         self.char_index = char_index
+        self.char_def_index = char_def_index
     
     def launch_vocab_app(self):
         """Launch the vocabulary learning app in a separate thread"""
@@ -92,7 +93,7 @@ class IntegratedApp:
 
             if mode == "Lookup Only":
                 print(f"Generating explanation for '{text}' in lookup-only mode...")
-                word_match, char_matches = lookup_cedict(text, self.word_index, self.char_index)
+                word_match, char_matches = lookup_cedict(text, self.word_index, self.char_def_index)
                 if word_match:
                     return f"{word_match['simplified']} ({word_match['traditional']}), Definitions: {'; '.join(word_match['definitions'])}"
                 elif char_matches:
@@ -120,7 +121,7 @@ class IntegratedApp:
             master=self.control_panel,
             display_image=(self.control_panel.response_mode.lower() != "lookup only"),
             word_index=self.word_index,
-            char_index=self.char_index,
+            char_def_index=self.char_def_index,
         )
         
         def stream_thread():
