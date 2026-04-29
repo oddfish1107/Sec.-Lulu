@@ -42,9 +42,10 @@ The setup is local, no cloud, no data collection. Just you and your language lea
 - [x] Integrated lookup mode(word hover: show translation + quick def) 
 - [x] ~~EasyOCR integration because Powertoys OCR messed it up sometimes~~ Powertoys OCR is enough for normal uses
 - [ ] Compact design (UI)
-- [ ] Clipboard state & Option to lookup immediately (UI)
+- [ ] multiple personality
+- [x] Clipboard state & Option to lookup immediately (UI)
 - [ ] **Click - save word**
-- [ ] TTS
+- [ ] Chinese mode + TTS
 - [ ] ~~Normal sentence + words mode~~
 
 - [ ] More test cases for each mode for debugging

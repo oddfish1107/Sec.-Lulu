@@ -41,8 +41,10 @@ class ControlPanel:
         self.opened = False
         self.done = False
         self.app_callback = app_callback
+        self.generate_callback = None  # Callback to generate explanation for clipboard text
         self.mode_index = 1
         self.response_mode = MODES[self.mode_index]
+        self.current_clipboard_text = ""  # Store the actual clipboard text
         
         self.root = ctk.CTk()
         self.root.title("Monitor")
@@ -55,6 +57,19 @@ class ControlPanel:
             text_color="gray"
         )
         self.status_label.pack(side="top", fill="x", padx=10, pady=5)
+        
+        # --- Clipboard Display (Clickable) ---
+        self.clipboard_label = ctk.CTkLabel(
+            self.root,
+            text="📋 (No clipboard text)",
+            text_color="gray",
+            wraplength=250,
+            justify="left",
+            cursor="hand2"
+        )
+        self.clipboard_label.pack(side="top", fill="x", padx=10, pady=5)
+        self.clipboard_label.bind("<Button-1>", self._on_clipboard_click)
+        
         # --- AI Control Buttons ---
         self.ai_btn = ctk.CTkButton(
             self.root, 
@@ -103,6 +118,27 @@ class ControlPanel:
             text=f"AI Status: {status_text}", 
             text_color=color
         ))
+    
+    def update_clipboard_display(self, text, is_valid_chinese=False):
+        """Update the clipboard display label. Thread-safe."""
+        self.current_clipboard_text = text
+        # Truncate to 40 chars + "..." if longer
+        display_text = text if len(text) <= 40 else text[:40] + "..."
+        # Color based on whether it's valid Chinese text
+        color = "orange" if is_valid_chinese else "gray"
+        icon = "📋" if not is_valid_chinese else "🔤"
+        self.root.after(0, lambda: self.clipboard_label.configure(
+            text=f"{icon} {display_text}",
+            text_color=color
+        ))
+    
+    def _on_clipboard_click(self, event):
+        """Handle click on clipboard display - generate explanation."""
+        if self.current_clipboard_text and self.generate_callback:
+            try:
+                self.generate_callback(self.current_clipboard_text)
+            except Exception as e:
+                tkmb.showerror("Error", f"Failed to generate explanation: {e}")
     def load_ai(self):
         """Calls the AI client to load the model into VRAM"""
         def task():

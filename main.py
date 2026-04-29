@@ -149,6 +149,14 @@ class IntegratedApp:
             
         popup.add_button("Save/Update word", save_logic)
     
+    def _generate_for_word(self, text):
+        """Generate explanation for a word and display in popup."""
+        explanation = self.get_explanation(text)
+        # Wrap string explanation in a generator if needed
+        if isinstance(explanation, str):
+            explanation = (explanation,)
+        self._show_explanation_popup(text, explanation)
+    
     def _poll_clipboard(self):
         """Poll clipboard for Chinese text - called via control_panel.root.after()"""
         if not self.control_panel or getattr(self.control_panel, "done", False):
@@ -163,28 +171,33 @@ class IntegratedApp:
         # If monitoring is paused
         if not getattr(self.control_panel, "opened", True):
             self.last_clipboard_text = current or ""
+            # Update display even when paused
+            if current:
+                is_chinese = any('\u4e00' <= ch <= '\u9fff' for ch in current)
+                self.control_panel.update_clipboard_display(current, is_chinese)
             self.control_panel.root.after(1000, self._poll_clipboard)
             return
         
         # Initialize last_clipboard_text
         if self.last_clipboard_text == "":
             self.last_clipboard_text = current or ""
+            if current:
+                is_chinese = any('\u4e00' <= ch <= '\u9fff' for ch in current)
+                self.control_panel.update_clipboard_display(current, is_chinese)
             self.control_panel.root.after(1000, self._poll_clipboard)
             return
         
-        # Check for new Chinese text
+        # Check for new text
         if current and current != self.last_clipboard_text:
             self.last_clipboard_text = current
-            if any('\u4e00' <= ch <= '\u9fff' for ch in (current or "")):
+            is_chinese = any('\u4e00' <= ch <= '\u9fff' for ch in current)
+            self.control_panel.update_clipboard_display(current, is_chinese)
+            
+            if is_chinese:
                 print(f"\n{'='*50}")
                 print(f"Detected: {current}")
                 print(f"{'='*50}")
-                
-                explanation = self.get_explanation(current)
-                # print(f"\nExplanation:\n{explanation}\n")
-                
-                # Show popup in separate thread
-                self._show_explanation_popup(current, explanation)
+                self._generate_for_word(current)
         
         # Schedule next poll
         self.control_panel.root.after(1000, self._poll_clipboard)
@@ -202,6 +215,8 @@ class IntegratedApp:
                 app_callback=self.launch_vocab_app, 
                 ai_client=self.ai
             )
+            # Set the callback for generating explanations when clipboard is clicked
+            self.control_panel.generate_callback = self._generate_for_word
             print("=" * 50)
             print("Integrated Vocabulary Learning System")
             print("=" * 50)
